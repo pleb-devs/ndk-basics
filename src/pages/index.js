@@ -2,6 +2,7 @@ import Head from "next/head";
 import styles from "@/styles/Home.module.css";
 import NDK from "@nostr-dev-kit/ndk";
 import Search from "./Search";
+import UpdateProfile from "./UpdateProfile";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       </Head>
       <main className={`${styles.main}`}>
         <Search />
+        <UpdateProfile />
       </main>
     </>
   );
