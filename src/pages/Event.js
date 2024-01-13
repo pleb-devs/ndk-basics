@@ -1,10 +1,8 @@
-import Image from "next/image";
-
+/* eslint-disable @next/next/no-img-element */
 export default function Event({ event }) {
   const stringify = (event) => {
-    const { id, kind, content, tags, created, pubkey, sig } = event;
     return JSON.stringify(
-      { id, kind, content, tags, created, pubkey, sig },
+      event.rawEvent(),
       null,
       2
     );
@@ -15,8 +13,8 @@ export default function Event({ event }) {
       const parsed = JSON.parse(event.content);
       return (
         <div>
-          <div>{parsed.name}</div>
-          {/* <Image src={parsed.picture} width={100} height={100} alt="" /> */}
+          <h3>{parsed.name}</h3>
+          <img src={parsed.picture} width={100} height={100} alt="" />
           <div>{parsed.about}</div>
         </div>
       );

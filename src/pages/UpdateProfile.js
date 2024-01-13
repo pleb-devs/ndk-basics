@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styles from "@/styles/Home.module.css";
 import { ndk } from "@/pages/index";
 import { NDKEvent, NDKKind, NDKNip07Signer } from "@nostr-dev-kit/ndk";
 
@@ -27,7 +28,7 @@ export default function UpdateProfile() {
     });
 
     // TIP: we did not set all the required fields for this to be a valid event
-    
+
     // event format defined here: https://github.com/nostr-protocol/nips/blob/master/01.md#events-and-signatures
     // NDK will automatically fill in the missing fields that it can
 
@@ -45,7 +46,9 @@ export default function UpdateProfile() {
   };
 
   return (
-    <div>
+    <div className={`${styles.update}`}>
+      <h2>Update Profile</h2>
+      <p>Create a new/updated kind0</p>
       <input
         type="text"
         value={username}
