@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { ndk } from "@/pages/index";
 import { nip19 } from "nostr-tools";
-import Kind0Event from "./Kind0Event";
+import Event from "./Event";
 
 const Search = () => {
   const [input, setInput] = useState("");
-  const [eventKind, setEventKind] = useState(null);
-  const [eventContent, setEventContent] = useState(null);
+  const [ndkEvent, setNdkEvent] = useState(null);
 
   // to serach for a kind 0 event singed by a specific pubkey
   const kind0Filter = (pubkey) => ({
@@ -25,11 +24,14 @@ const Search = () => {
     // tell the relays what we're looking for with a "filter"
     // https://github.com/nostr-protocol/nips/blob/master/01.md#communication-between-clients-and-relays
     let filter = {};
+
+    // nip19 defines a standard for bech32 encoding of different data types (pubkey, note id, etc.)
+    // https://github.com/nostr-protocol/nips/blob/master/19.md
     if (query.startsWith("npub")) {
       const decodedNpub = nip19.decode(query);
       const pubkey = decodedNpub.data;
 
-      filter = kind0Filter(pubkey);
+      filter = kind0Filter(pubkey); // TODO: search for profile (kind 0) along with kind 1 events authored by this pubkey
     } else if (query.startsWith("note")) {
       const decodedNote = nip19.decode(query);
       const noteId = decodedNote.data;
@@ -40,26 +42,16 @@ const Search = () => {
     console.log("SEARCH FILTER", filter);
 
     // fetchEvent takes a type of NDKFilter
-    // see node_modules/@nostr-dev-kit/ndk/dist/index.d.mts --> "type NDKFilter"
-    const event = await ndk.fetchEvent(filter);
-
-    return parseSearchResult(event);
-  };
-
-  const parseSearchResult = (event) => {
-    if (event.kind === 0) {
-      const parsed = JSON.parse(event.content);
-      return { parsed, kind: 0 };
-    } else {
-      return { parsed: event, kind: null };
-    }
+    // see node_modules/@nostr-dev-kit/ndk/dist/index.d.ts --> "type NDKFilter"
+    return await ndk.fetchEvent(filter);
   };
 
   const handleSearch = async (query) => {
-    const { parsed, kind } = await search(query);
-
-    setEventKind(kind);
-    setEventContent(parsed);
+    const result = await search(query);
+    if (result) {
+      console.log("SEARCH RESULT", result);
+      setNdkEvent(result);
+    }
   };
 
   return (
@@ -70,7 +62,7 @@ const Search = () => {
         onChange={(e) => setInput(e.target.value)}
       />
       <button onClick={() => handleSearch(input)}>Search</button>
-      {eventKind === 0 && Kind0Event({ event: eventContent })}
+      <Event event={ndkEvent} />
     </div>
   );
 };
