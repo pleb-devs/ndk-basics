@@ -18,12 +18,6 @@ export default function UpdateProfile() {
     // https://github.com/nostr-protocol/nips/blob/master/01.md
     const kind0 = new NDKEvent(ndk, { kind: NDKKind.Metadata });
 
-    // get the user object from the NIP07 browser extension
-    const user = await signer.user();
-
-    // the pubkey is set to whichever key is going to sign the event
-    kind0.pubkey = user.pubkey;
-
     // kind0 content is set to a stringified JSON object {name: <username>, about: <string>, picture: <url, string>, ...}
     // https://github.com/nostr-protocol/nips/blob/master/01.md#kinds
     kind0.content = JSON.stringify({
@@ -32,8 +26,19 @@ export default function UpdateProfile() {
       picture,
     });
 
+    // TIP: we did not set all the required fields for this to be a valid event
+    
+    // event format defined here: https://github.com/nostr-protocol/nips/blob/master/01.md#events-and-signatures
+    // NDK will automatically fill in the missing fields that it can
+
+    // CHALLENGE: What are the missing fields? How does NDK fill them in?
+
+    console.log("Unsigned KIND0", kind0.rawEvent());
+
     // use NIP07 to sign the event
     await kind0.sign(signer);
+
+    console.log("Signed KIND0", kind0.rawEvent());
 
     // publish the event to the relays we connected to in index.js
     await kind0.publish();
